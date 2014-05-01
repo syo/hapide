@@ -245,8 +245,8 @@ p {
   text-align: center;
 }
 .navbar {
-  padding-top: 39px;
-  padding-bottom: 39px;
+  padding-top: 20px;
+  padding-bottom: 15px;
 }
 .social-widget {
   display: inline-block;
@@ -387,4 +387,25 @@ p {
 	height: 960px;
 	width: 69%;
 	float: left;
+}
+#searchResult {
+	margin-top: 25px;
+	margin-bottom: 25px;
+	margin-right: 10px;
+	border-top: solid 1px black;
+}
+#searchResult .resultCont {
+	border-bottom: ridge;
+	padding: 20px 0px;
+	opacity: 0.0;
+}
+#searchResult .resultCont .spotName {
+}
+#searchResult .resultCont .spotZip {
+}
+#searchResult .resultCont .spotAddress {
+}
+#map_canvas { 
+	width: 100%; 
+	height: 400px; 
 }

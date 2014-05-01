@@ -26,7 +26,7 @@ class MainController extends AppController {
   }
 
 	public
-		$uses = Array('User'),
+		$uses = Array('User', 'Spot'),
 		$components = Array(
 			'Session',
 			'Auth' => Array(
@@ -67,6 +67,12 @@ class MainController extends AppController {
 
 	public function logout($id = null) {
 		$this->redirect($this->Auth->logout());
+	}
+
+	public function find() {
+		$this->layout = '';
+		$allSpots= $this->Spot->find('all', array('conditions' => array('Spot.spotname LIKE' => '%'.$_POST['sw'].'%')));
+		$this->set('Spots',$allSpots);
 	}
 
 }

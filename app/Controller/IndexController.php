@@ -13,7 +13,17 @@ class IndexController extends AppController {
  *
  * @var array
  */
-  public $uses = array();
+	public
+		$uses = Array('User'),
+		$components = Array(
+			'Session',
+			'Auth' => Array(
+				'loginRedirect' => Array('controller'  => 'main', 'action' => 'index'),
+				'logoutRedirect' => Array('controller' => 'main', 'action' => 'login'),
+				'loginAction' => Array('controller' => 'main', 'action' => 'login'),
+				'authenticate' => Array('Form' => Array('fields' => Array('username' => 'email')))
+			)
+		);
 
 /**
  * Displays a view
@@ -22,6 +32,10 @@ class IndexController extends AppController {
  * @return void
  */
   public function index() {
-    $this->render();
+		if(!$this->Auth->user()){
+			$this->render();
+		} else {
+			$this->redirect(array('controller' => 'main', 'action' => 'index'));
+		}
   }
 }

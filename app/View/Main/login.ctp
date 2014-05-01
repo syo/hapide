@@ -12,4 +12,5 @@
     	</tr>
     </table>
     <?php echo $this->Form->end('ログイン'); ?>
+		未登録の方は<?php echo $this->Html->link('こちら', '/users/signup' ) ?>から登録
 </div>

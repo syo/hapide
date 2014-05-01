@@ -27,8 +27,6 @@ $cakeDescription = __d('cake_dev', 'CakePHP: the rapid development php framework
 		<?php echo $title_for_layout; ?>
 	</title>
 	<?php
-		echo $this->Html->meta('icon');
-
 		echo $this->Html->css('webflow.css');
 		echo $this->Html->css('hapide.css');
 
@@ -56,7 +54,11 @@ $cakeDescription = __d('cake_dev', 'CakePHP: the rapid development php framework
 						<div class="w-col w-col-8 nav-column">
 							<a class="nav-link" href="#">Features</a>
 							<?php echo $this->Html->link('SIGN UP', '/users/signup', array('class' => 'nav-link') ) ?>
-							<?php echo $this->Html->link('LOGIN', '/main/login', array('class' => 'nav-link') ) ?>
+							<?php if(isset($user)): ?>
+								<?php echo $this->Html->link('LOGOUT', '/main/logout', array('class' => 'nav-link') ) ?>
+							<?php else: ?>
+								<?php echo $this->Html->link('LOGIN', '/main/login', array('class' => 'nav-link') ) ?>
+							<?php endif; ?>
 						</div>
 					</div>
 				</div>
