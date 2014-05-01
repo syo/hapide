@@ -22,7 +22,7 @@ $(document).ready(function(){
 
 		var search_word = $("#searchForm").val();	
 
-		if (search_word == "" || search_word == old_search_word){
+		if (search_word == old_search_word){
 			return;
 		}
 

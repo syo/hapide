@@ -71,8 +71,13 @@ class MainController extends AppController {
 
 	public function find() {
 		$this->layout = '';
-		$allSpots= $this->Spot->find('all', array('conditions' => array('Spot.spotname LIKE' => '%'.$_POST['sw'].'%')));
-		$this->set('Spots',$allSpots);
+		if ($_POST['sw'] == ""){
+			$allSpots = array();
+			$this->set('Spots',$allSpots);
+		} else {
+			$allSpots = $this->Spot->find('all', array('conditions' => array('Spot.spotname LIKE' => '%'.$_POST['sw'].'%')));
+			$this->set('Spots',$allSpots);
+		}
 	}
 
 }
