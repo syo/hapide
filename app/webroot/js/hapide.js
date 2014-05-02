@@ -5,13 +5,16 @@ $(document).ready(function(){
 	var old_search_word;
 	var map;
 	var marker = [];
+	var directionsService;
 
+	// 前回の入力値を取得
 	$('#searchForm').keydown(function(){
 
 		old_search_word = $("#searchForm").val();	
 
 	});
 
+	// 入力値からリアルタイムに検索
 	$('#searchForm').keyup(function(event){
 
 		var search_word = $("#searchForm").val();	
@@ -29,9 +32,10 @@ $(document).ready(function(){
 				$("#searchResult").html(data);
 				$(".resultCont").animate({opacity: "1"}, 500);
 			});
-		}, 1000);
+		}, 500);
 	});
 
+	// クリックした検索結果を地図上にマーキング
 	$('#searchResult').on('click','div.resultCont',function(){
 		var spotName = $('.spotName').html().replace(/\s+/g, "");
 		var latlng = new google.maps.LatLng($('.longitude').val(),$('.latitude').val());
@@ -40,35 +44,140 @@ $(document).ready(function(){
 				map: map, 
 				title: spotName
 		}));
+
+		if (marker.length > 1){
+			displayRoute();
+		} else {
+			map.panTo(new google.maps.LatLng(marker[marker.length - 1]['position']['k'],marker[marker.length - 1]['position']['A']));
+		}
+
 		$('#dropList').append('<span>'+spotName+'</span>');
-		$('#dropList').append('<button class="deleteSpot" value="'+spotName+'">削除</button>');
+		$('#dropList').append('<button class="zoomSpot" value="'+spotName+'">位置詳細</button>');
+		$('#dropList').append('<button class="deleteSpot" value="'+spotName+'">削除</button><br>');
 	});
 
+	// ルート表示
+	function displayRoute(){
+		var start = new google.maps.LatLng(marker[0]['position']['k'], marker[0]['position']['A']);
+		var end = new google.maps.LatLng(marker[marker.length - 1]['position']['k'], marker[marker.length - 1]['position']['A']);
+		var request = {
+			//開始位置
+			origin:start,
+			//終着位置
+			destination:end,
+			//通過ポイント
+			// waypoints:waypts,
+			travelMode:google.maps.DirectionsTravelMode.WALKING
+		};
+
+		directionsService.route(request, function(result, status) {
+			if (status == google.maps.DirectionsStatus.OK) {
+				console.log("OK");
+				directionsDisplay.setDirections(result);
+			}
+		});
+
+		var rendererOptions = {
+			map: map,
+			suppressMarkers : true
+		}
+
+		directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
+		directionsDisplay.polylineOptions = { 
+			path: null, 
+			strokeWeight: 5, 
+			strokeColor: "#0000ff", 
+			strokeOpacity: "0.5" 
+		};
+
+		directionsDisplay.setMap(map);
+
+	}
+
+	// マーカー一覧から削除
 	$('#mapArea').on('click', '.deleteSpot', function(){
-		deleteSpotName = $('.deleteSpot').val();	
+		var deleteSpotName = $(this).val();	
 		for (var i = 0; i < marker.length; i++){
 			if (marker[i]['title'] == deleteSpotName) {
 				marker[i].setMap(null);
-				delete marker[i];
+				marker.splice(i,1);
 			}
 		}
 		$(this).prev().remove();
 		$(this).remove();
 	});
 
+	// マーカー一覧から位置を移動
+	$('#mapArea').on('click', '.zoomSpot', function(){
+		var zoomSpotName = $(this).val();	
+		var zoomSpotLon;
+		var zoomSpotLat;
+		for (var i = 0; i < marker.length; i++){
+			if (marker[i]['title'] == zoomSpotName) {
+				zoomSpotLon = marker[i]['position']['k'];
+				zoomSpotLat = marker[i]['position']['A'];
+			}
+		}
+		map.panTo(new google.maps.LatLng(zoomSpotLon, zoomSpotLat));
+		map.setZoom(18);
+	});
+
+	// スポット全表示
+	$('#showAllMarker').click(function(){
+
+			if (marker.length == 0){
+				return;
+			}
+
+			var maxlat = -9999;
+			var maxlng = -9999;
+			var minlat = 9999;
+			var minlng = 9999;
+
+			for(var i = 0; i < marker.length; i++){
+				if ( marker[i]['position']['k'] > maxlat) {
+					maxlat = marker[i]['position']['k'];
+				}
+				if ( marker[i]['position']['k'] < minlat) {
+					minlat = marker[i]['position']['k'];
+				}
+				if ( marker[i]['position']['A'] > maxlng) {
+					maxlng = marker[i]['position']['A'];
+				}
+				if ( marker[i]['position']['A'] < minlng) {
+					minlng = marker[i]['position']['A'];
+				}
+			}
+
+		//北西端の座標を設定
+		var sw = new google.maps.LatLng(maxlat,minlng);
+
+		//東南端の座標を設定
+		var ne = new google.maps.LatLng(minlat,maxlng);
+		 
+		//範囲を設定
+		var bounds = new google.maps.LatLngBounds(sw, ne);
+		 
+		//自動調整
+		map.fitBounds(bounds,5);
+
+	});
+
+	// 初期処理
 	function initialize() {
 		var geocoder = new google.maps.Geocoder();
 		geocoder.geocode({
-			'address': '東京駅'
+			'address': '東京'
 		}, function(result, status) {
 			if (status == google.maps.GeocoderStatus.OK) {
 				var latlng = result[0].geometry.location;
 				var myOptions = {
-					zoom: 10,
+					zoom: 15,
 					center: latlng,
 					mapTypeId: google.maps.MapTypeId.ROADMAP
 				 };
 				map = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
+				directionsService = new google.maps.DirectionsService();
 			} else {
 				alert('取得できませんでした…');
 			}

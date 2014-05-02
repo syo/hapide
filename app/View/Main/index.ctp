@@ -11,6 +11,7 @@
 		</div>
 	</div>
 	<div id="mapArea">
+		<button id="showAllMarker">スポット全表示</button>
 		<div id="map_canvas"></div>
 		<div id="dropList"></div>
 	</div>
