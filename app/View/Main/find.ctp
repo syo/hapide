@@ -9,5 +9,7 @@
 	<div class="spotAddress">
 		<?php echo $spot['Spot']['address']; ?>
 	</div>
+	<input type="hidden" class="latitude" value="<?php echo $spot['Spot']['lat']; ?>">
+	<input type="hidden" class="longitude" value="<?php echo $spot['Spot']['lon']; ?>">
 </div>
 <?php endforeach; ?>

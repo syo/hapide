@@ -53,7 +53,9 @@ $cakeDescription = __d('cake_dev', 'CakePHP: the rapid development php framework
 						</div>
 						<div class="w-col w-col-8 nav-column">
 							<a class="nav-link" href="#">Features</a>
-							<?php echo $this->Html->link('SIGN UP', '/users/signup', array('class' => 'nav-link') ) ?>
+							<?php if(!isset($user)): ?>
+								<?php echo $this->Html->link('SIGN UP', '/users/signup', array('class' => 'nav-link') ) ?>
+							<?php endif; ?>
 							<?php if(isset($user)): ?>
 								<?php echo $this->Html->link('LOGOUT', '/main/logout', array('class' => 'nav-link') ) ?>
 							<?php else: ?>
