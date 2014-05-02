@@ -12,5 +12,6 @@
 	</div>
 	<div id="mapArea">
 		<div id="map_canvas"></div>
+		<div id="dropList"></div>
 	</div>
 </div>

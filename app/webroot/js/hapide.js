@@ -4,6 +4,7 @@ $(document).ready(function(){
 	var	realtime_search;
 	var old_search_word;
 	var map;
+	var marker = [];
 
 	$('#searchForm').keydown(function(){
 
@@ -32,12 +33,27 @@ $(document).ready(function(){
 	});
 
 	$('#searchResult').on('click','div.resultCont',function(){
+		var spotName = $('.spotName').html().replace(/\s+/g, "");
 		var latlng = new google.maps.LatLng($('.longitude').val(),$('.latitude').val());
-		var marker = new google.maps.Marker({
+		marker.push(new google.maps.Marker({
 				position: latlng, 
 				map: map, 
-				title: '表参道駅'
-		});
+				title: spotName
+		}));
+		$('#dropList').append('<span>'+spotName+'</span>');
+		$('#dropList').append('<button class="deleteSpot" value="'+spotName+'">削除</button>');
+	});
+
+	$('#mapArea').on('click', '.deleteSpot', function(){
+		deleteSpotName = $('.deleteSpot').val();	
+		for (var i = 0; i < marker.length; i++){
+			if (marker[i]['title'] == deleteSpotName) {
+				marker[i].setMap(null);
+				delete marker[i];
+			}
+		}
+		$(this).prev().remove();
+		$(this).remove();
 	});
 
 	function initialize() {
