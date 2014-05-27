@@ -51,10 +51,47 @@ $(document).ready(function(){
 			map.panTo(new google.maps.LatLng(marker[marker.length - 1]['position']['k'],marker[marker.length - 1]['position']['A']));
 		}
 
-		$('#dropList').append('<span>'+spotName+'</span>');
-		$('#dropList').append('<button class="zoomSpot" value="'+spotName+'">位置詳細</button>');
-		$('#dropList').append('<button class="deleteSpot" value="'+spotName+'">削除</button><br>');
+		var appendDropList = '<div class="spotListCont"><span>'+ spotName +'</span>';
+		appendDropList += '<input type="hidden" name="dropLatitude" value=' + $('.latitude').val() + '></input>';
+		appendDropList += '<input type="hidden" name="dropLongitude" value=' + $('.longitude').val() + '></input></div>';
+
+		$('#dropList').append(appendDropList);
+		// $('.spotListCont').append('<button class="zoomSpot" value="'+spotName+'">位置詳細</button>');
+		// $('.spotListCont').append('<button class="deleteSpot" value="'+spotName+'">削除</button><br>');
+		$("#dropList").sortable({
+       update: function(event, ui) {
+				 updateSpot($("[name='dropLatitude']"), $("[name='dropLongitude']"));
+       }
+	  });
+		$("#dropList").disableSelection();
+		clickSpot($('.latitude').val(),$('.longitude').val());
 	});
+
+	function clickSpot(x, y) {
+		heartrailsURL = "http://express.heartrails.com/api/json?method=getStations&";
+		heartrailsURL += "x=" + x + "&";
+		heartrailsURL += "y=" + y + "&";
+		heartrailsURL += "jsonp=getStation"; // JSONPのコールバック関数
+		var script = document.createElement('script');
+		script.src = heartrailsURL;
+		document.body.appendChild(script);
+	}
+
+	function updateSpot(x, y) {
+		$('div#nearestStation').empty();
+
+		for (var i = 0; i < x.length; i++){
+			setTimeout ( (function(){
+				heartrailsURL = "http://express.heartrails.com/api/json?method=getStations&";
+				heartrailsURL += "x=" + x[i]['value'] + "&";
+				heartrailsURL += "y=" + y[i]['value'] + "&";
+				heartrailsURL += "jsonp=getStation"; 
+				var script = document.createElement('script');
+				script.src = heartrailsURL;
+				document.body.appendChild(script);
+			})(), 1000);
+		}
+	}
 
 	// ルート表示
 	function displayRoute(){
@@ -67,12 +104,11 @@ $(document).ready(function(){
 			destination:end,
 			//通過ポイント
 			// waypoints:waypts,
-			travelMode:google.maps.DirectionsTravelMode.WALKING
+			travelMode:google.maps.DirectionsTravelMode.TRANSIT
 		};
 
 		directionsService.route(request, function(result, status) {
 			if (status == google.maps.DirectionsStatus.OK) {
-				console.log("OK");
 				directionsDisplay.setDirections(result);
 			}
 		});
@@ -161,6 +197,11 @@ $(document).ready(function(){
 		//自動調整
 		map.fitBounds(bounds,5);
 
+	});
+
+	$('#saveRoute').click(function(){
+		var route = $('.spotListCont');
+		console.log(route);
 	});
 
 	// 初期処理
